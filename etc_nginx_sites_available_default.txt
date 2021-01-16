@@ -1,0 +1,32 @@
+vagrant@balancer:~$ cat /etc/nginx/sites-available/default
+upstream backend {
+ server 192.168.100.11;
+ server 192.168.100.12;
+}
+
+upstream even {
+server 192.168.100.12;
+}
+
+upstream odd {
+server 192.168.100.11;
+}
+
+server {
+listen 80;
+
+location /odd/ {
+rewrite ^/odd(.*) /$1 break;
+proxy_pass http://odd;
+}
+
+location /even/ {
+rewrite ^/even(.*) /$1 break;
+proxy_pass http://even;
+}
+
+location /worker {
+rewrite ^/worker(.*) /$1 break;
+proxy_pass http://backend;
+}
+}
